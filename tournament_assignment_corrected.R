@@ -31,6 +31,10 @@ Agent <- R6Class("Agent",
                      self$round <- round
                    },
                    
+		   # function to test whether opponent uses tit-tat-strategy
+                   # if yes, return TRUE
+                   # else returns FALSE
+                   # only use it after a minimum of rounds playes
 	           is_tit_tat = function() {
                      t = self$book
                      
