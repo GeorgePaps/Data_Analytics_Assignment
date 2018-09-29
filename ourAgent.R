@@ -10,6 +10,8 @@ Agent <- R6Class("Agent",
                    opponent_id = NULL,
                    round = NULL, 
                    response = NULL,
+	           clean_list = NULL, 
+                   lemon_list = list(),
                    
                    set_book = function(book=NA) {
                      self$book <- book
@@ -31,6 +33,26 @@ Agent <- R6Class("Agent",
                      self$round <- round
                    },
                    
+		    clean_book = function() {
+                     t = self$book
+                     id = self$lemon_list
+                     cleaned_book = NULL
+                     if (is.null(self$lemon_list)) {
+                       return (self$book)
+                     }
+                     else {
+                       cleaned_book = t[(t$id1 != id[0]) & (t$id2 != id[0]),]
+                                         & (t$id1 != id[1]) & (t$id2 != id[1])
+                                         & (t$id1 != id[2]) & (t$id2 != id[2])
+                                         & (t$id1 != id[3]) & (t$id2 != id[3])]
+               
+                       #for (id in self$lemon_list) {
+                         #cleaned_book = rbind(cleaned_book, t[(t$id1 != id) & (t$id1 != id),])
+                       #}
+                     return (cleaned_book)
+                     }
+                   },
+			 
 		   # function to test whether opponent uses tit-tat-strategy
                    # if yes, return TRUE
                    # else returns FALSE
@@ -61,6 +83,7 @@ Agent <- R6Class("Agent",
                    get_bid = function() {
                      if(self$response == "Lemon!"){
                        self$bid = "defect"
+		       self$lemon_list = c(self$lemon_list, self$opponent_id)
                      } else {
                        bid_vector <- c("cooperate","defect")
                        self$bid <- sample(bid_vector,1)
