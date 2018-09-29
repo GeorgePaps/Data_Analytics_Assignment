@@ -1,5 +1,3 @@
-# a change
-
 library(R6)
 
 Agent <- R6Class("Agent",
@@ -86,7 +84,24 @@ Agent <- R6Class("Agent",
                        self$bid = "defect"
                      }
                    }
-                 )
+                 ),
+		 
+		 private = list(		 
+				fraction_op = function(){
+					print(self$opponent_id)
+					rec1 = self$book[(self$book)$id1 == self$opponent_id, c("round","bid1")]
+					rec2 = self$book[self$book$id2 == self$opponent_id, c("round","bid2")]				
+					names(rec1) = c("round","bid")
+					names(rec2) = c("round","bid")
+					rec = rbind(rec1,rec2)                    
+					n_def = nrow(rec[rec$bid == "defect",])
+					n_cop = nrow(rec[rec$bid == "cooperate",])
+					tot_rounds = nrow(rec)                    
+					def_frac = n_def/tot_rounds
+					print(def_frac)
+					return(def_frac)
+				}
+		 )
 )
 
 book = read.table("data/tournament.csv",header=TRUE,sep=",")
