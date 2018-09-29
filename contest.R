@@ -76,6 +76,44 @@ Cherry <- R6Class("Cherry",
                  )
 )
 
+Peach <- R6Class("Peach",
+                  
+                  public = list(
+                    bid = NULL,
+                    book = NULL,
+                    my_greeting = "Peach!",
+                    my_id = NULL,
+                    opponent_id = NULL,
+                    round = NULL, 
+                    greeting_response = NULL,
+                    
+                    set_book = function(book=NA) {
+                      self$book <- book
+                    },
+                    
+                    set_id = function(id=NA) {
+                      self$my_id = id
+                    },
+                    
+                    set_opponent_id = function(opponent_id=NA) {
+                      self$opponent_id = opponent_id
+                    },
+                    
+                    set_response = function(response=NA) {
+                      self$greeting_response <-response 
+                    },
+                    
+                    set_round = function(round=NA) {
+                      self$round <- round
+                    },
+                    
+                    get_bid = function() {
+                      bid_vector <- c("cooperate","defect")
+                      self$bid <- sample(bid_vector,1)
+                    }
+                  )
+)
+
 Agent <- R6Class("Agent",
                  
                  public = list(
@@ -162,7 +200,7 @@ agent_1$set_id(1)
 agent_2 = Cherry$new()
 agent_2$set_id(2)
 
-agent_3 = Cherry$new()
+agent_3 = Peach$new()
 agent_3$set_id(3)
 
 agent_4 = Agent$new()
