@@ -5,7 +5,7 @@ Agent <- R6Class("Agent",
                  public = list(
                    bid = NULL,
                    book = NULL,
-                   greeting = "Hi!",
+                   greeting = "Hi we are malware!", 
                    id = NULL,
                    opponent_id = NULL,
                    round = NULL, 
