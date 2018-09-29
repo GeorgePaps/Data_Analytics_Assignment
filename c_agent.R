@@ -1,4 +1,8 @@
 library(R6)
+
+# test
+
+
 Agent <- R6Class("Agent",
                  
                  public = list(
