@@ -88,7 +88,6 @@ Agent <- R6Class("Agent",
 		 
 		 private = list(		 
 				fraction_op = function(){
-					print(self$opponent_id)
 					rec1 = self$book[(self$book)$id1 == self$opponent_id, c("round","bid1")]
 					rec2 = self$book[self$book$id2 == self$opponent_id, c("round","bid2")]				
 					names(rec1) = c("round","bid")
@@ -98,7 +97,6 @@ Agent <- R6Class("Agent",
 					n_cop = nrow(rec[rec$bid == "cooperate",])
 					tot_rounds = nrow(rec)                    
 					def_frac = n_def/tot_rounds
-					print(def_frac)
 					return(def_frac)
 				}
 		 )
