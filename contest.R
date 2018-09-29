@@ -1,5 +1,7 @@
 library(R6)
 
+#Below are the different types of agents
+
 Lemon <- R6Class("Lemon",
                  
                  public = list(
@@ -16,7 +18,7 @@ Lemon <- R6Class("Lemon",
                    },
                    
                    set_id = function(id=NA) {
-                     self$id = id
+                     self$my_id = id
                    },
                    
                    set_opponent_id = function(opponent_id=NA) {
@@ -31,21 +33,18 @@ Lemon <- R6Class("Lemon",
                      self$round <- round
                    },
                    
-                   
                    get_bid = function() {
-                     #print(self$response)
-                       self$bid <- "defect"
-                    
+                     self$bid <- "defect"
                    }
                  )
 )
 
-Agenta <- R6Class("Agenta",
+Cherry <- R6Class("Cherry",
                  
                  public = list(
                    bid = NULL,
                    book = NULL,
-                   my_greeting = "Hi!",
+                   my_greeting = "Cherry!",
                    my_id = NULL,
                    opponent_id = NULL,
                    round = NULL, 
@@ -56,7 +55,7 @@ Agenta <- R6Class("Agenta",
                    },
                    
                    set_id = function(id=NA) {
-                     self$id = id
+                     self$my_id = id
                    },
                    
                    set_opponent_id = function(opponent_id=NA) {
@@ -71,103 +70,10 @@ Agenta <- R6Class("Agenta",
                      self$round <- round
                    },
                    
-                   
                    get_bid = function() {
-                     if(self$greeting_response == "Lemon!"){
-                       self$bid = "defect"
-                     } else {
-                       #bid_vector <- c("cooperate","defect","defect","defect")
-                       #self$bid <- sample(bid_vector,1)
-                       self$bid = "cooperate"
-                     }
+                     self$bid <- "cooperate"
                    }
                  )
-)
-
-Agentb <- R6Class("Agentb",
-                  
-                  public = list(
-                    bid = NULL,
-                    book = NULL,
-                    my_greeting = "Hiii!",
-                    my_id = NULL,
-                    opponent_id = NULL,
-                    round = NULL, 
-                    greeting_response = NULL,
-                    
-                    set_book = function(book=NA) {
-                      self$book <- book
-                    },
-                    
-                    set_id = function(id=NA) {
-                      self$id = id
-                    },
-                    
-                    set_opponent_id = function(opponent_id=NA) {
-                      self$opponent_id = opponent_id
-                    },
-                    
-                    set_response = function(response=NA) {
-                      self$greeting_response <-response 
-                    },
-                    
-                    set_round = function(round=NA) {
-                      self$round <- round
-                    },
-                    
-                    
-                    get_bid = function() {
-                      if(self$greeting_response == "Lemon!"){
-                        self$bid = "defect"
-                      } else {
-                        #bid_vector <- c("cooperate","defect","defect","defect")
-                        #self$bid <- sample(bid_vector,1)
-                        self$bid = "cooperate"
-                      }
-                    }
-                  )
-)
-
-Agentc <- R6Class("Agentc",
-                  
-                  public = list(
-                    bid = NULL,
-                    book = NULL,
-                    my_greeting = "Hiiii!",
-                    my_id = NULL,
-                    opponent_id = NULL,
-                    round = NULL, 
-                    greeting_response = NULL,
-                    
-                    set_book = function(book=NA) {
-                      self$book <- book
-                    },
-                    
-                    set_id = function(id=NA) {
-                      self$id = id
-                    },
-                    
-                    set_opponent_id = function(opponent_id=NA) {
-                      self$opponent_id = opponent_id
-                    },
-                    
-                    set_response = function(response=NA) {
-                      self$greeting_response <-response 
-                    },
-                    
-                    set_round = function(round=NA) {
-                      self$round <- round
-                    },
-                    
-                    
-                    get_bid = function() {
-                      if(self$greeting_response == "Lemon!"){
-                        self$bid = "defect"
-                      } else {
-                        self$bid <- "defect"
-                      }
-                    }
-                  )
 )
 
 Agent <- R6Class("Agent",
@@ -186,7 +92,7 @@ Agent <- R6Class("Agent",
                    },
                    
                    set_id = function(id=NA) {
-                     self$id = id
+                     self$my_id = id
                    },
                    
                    set_opponent_id = function(opponent_id=NA) {
@@ -206,79 +112,88 @@ Agent <- R6Class("Agent",
                      #if we encounter fake agents, greeting with "Lemon!", we defect
                      if(self$greeting_response == "Lemon!"){
                        self$bid = "defect"
-                     } else {                                   #if the agent we encount is not fake
-                       
-                       #if we encounter an opponent for the first time, we cooperate
-                       #find out if this is the first time we encounter an agent
-                       num_enc1 = nrow( self$book[((self$book)$id1 == self$my_id & (self$book)$id2 == self$opponent_id),] )
-                       num_enc2 = nrow( self$book[((self$book)$id2 == self$my_id & (self$book)$id1 == self$opponent_id),] )
-                       if( is.null(num_enc1) & is.null(num_enc2)){
-                         first_enc = TRUE
-                       } else {
-                         first_enc = FALSE
-                       }
-                       
-                       if( first_enc == TRUE){
-                         self$bid = "cooperate"
-                       } else{                                 #if this is not our first encounter
-                         bid_vector <- c("cooperate","defect")
-                         self$bid <- sample(bid_vector,1)
-                         
-                       }
-                       
+                     } else {
+                       self$bid = private$tit_for_tat()
                      }
+                   }
+                 ),
+                 
+                 private = list(		 
+                   last_interact = function() {   #interaction between two agents self$id, self$opponent_id
+                     t = self$book  
+                     rec1 = t[(t$id1 == self$my_id & t$id2 == self$opponent_id), c("round","bid2")]  #rec1 is a vector that contains all the lines that (t$id1 == self$id & t$id2 == self$opponent_id) == TRUE, but has only the "round" and "bid2" columns
+                     rec2 = t[(t$id1 == self$opponent_id & t$id2 == self$my_id), c("round","bid1")]
                      
+                     names(rec1) = c("round","bid")   # change names of variables because otherwise there is problem when you will try to combine the two vectors in one
+                     names(rec2) = c("round","bid")
+                     all_rec = rbind(rec1,rec2)       # this vector contains all the encounters of agents self$id, self$opponent_id
                      
-                     
+                     if (nrow(all_rec) > 0) {         # if the two agents have met in the past
+                       round = all_rec$round          # a vector of all the rounds
+                       n = max(round)                 # the largest number in this vector is the last time the two agents met
+                       last = all_rec[all_rec$round == n,"bid"]
+                     } else{                          # if the agents haven't met yet
+                       last = NULL
+                     }
+                     return(last)
+                   },
+                   
+                   tit_for_tat = function() {
+                     their_last = private$last_interact()
+                     if (is.null(their_last)) {
+                       bid = "cooperate"
+                     } else {
+                       bid = their_last
+                       }
+                     return(bid)
                    }
                  )
 )
 
-#book = read.table("tournament.csv",header=TRUE,sep=",")
-first = Lemon$new()
-first$set_id(1)
-second = Agenta$new()
-second$set_id(2)
-third = Agentb$new()
-second$set_id(3)
-fourth = Agent$new()
-second$set_id(4)
+#==============================================================================================================================================================
 
+# create a list of agents
 agent_list = list()
-agent_list[[1]] = first
-agent_list[[2]] = second
-agent_list[[3]] = third
-agent_list[[4]] = fourth 
+
+# create and initialize agents
+agent_1 = Lemon$new()
+agent_1$set_id(1)
+
+agent_2 = Cherry$new()
+agent_2$set_id(2)
+
+agent_3 = Cherry$new()
+agent_3$set_id(3)
+
+agent_4 = Agent$new()
+agent_4$set_id(4)
+
+# put agents in a list
+agent_list[[1]] = agent_1
+agent_list[[2]] = agent_2
+agent_list[[3]] = agent_3
+agent_list[[4]] = agent_4
+
+#=========================================================================================================================================================================
 
 
-print(agent_list)
-book = data.frame(id1=integer(),id2=integer(),round=integer(),bid1=character(),bid2=character(),points1=integer(),points2=integer())
 
-#df = data.frame(bid1=character(),bid2=character(),payoff1=integer(),payoff2=integer())
-x = c("cooperate","cooperate","defect","defect")
-y = c("defect","cooperate","defect","cooperate")
-z = c(0,4,2,5)
-pame = c(5,4,2,0)
-df = data.frame(bid1=x,bid2=y,payoff1=z,payoff2=pame)
-print(df)
-u = c(1,2,3,4)
-iade = c(0,0,0,0)
-payoffs = data.frame(payoff1=0,payoff2=0)
-test_payoff = data.frame(id=u,pointss=iade)
+# create the payoff table
+df = data.frame(bid1=c("cooperate","cooperate","defect","defect"),bid2=c("defect","cooperate","defect","cooperate"),payoff1= c(0,4,2,5),payoff2= c(5,4,2,0))
 
-test_payoff$pointss[2]
+# create the tournament's book
+book = data.frame(id1=integer(),id2=integer(),round=integer(),bid1=character(),bid2=character())
 
+# create a ledger to keep the points of every agent, it should have the same number of "0" as the number of agents
+ledger = c(0,0,0,0)
 
-#The following code determines the matches, who is going to face whom 
-# ===================================================================================
-# each agent gets to play 1000 times
-# matches are paired opportunities for agents to compete
+# create the schedule of the tournament, who is going to face whom in each round
 matches <- c()
 
 for (i in 1:10) {
   
   # There will be an even number of agents, up to about 40
-  # each agent has a unique id
+  # each agent has a unique id, this should have the same number as the agents
   id_list<-1:4
   
   # shuffle the list in place
@@ -303,25 +218,14 @@ for (i in 1:10) {
   }
 }
 
-#====================================================================================
-
-# Run the Tournament
+# x is the total number of games that will be played
 x <- length(matches)
-#print(x)
-#print(contestants)
 
-# Contestants is a list of list
-# The outer list is a list of contests
-# The inner list is a list of two agents
-payofft = data.frame(id=1:4,point=0)
-payoff1 = 0 
-payoff2 = 0
+# Run the tournament
 for (i in 1:x) {
   
-  # find the first contest
-  # get the list, not the slice
-  contest <- matches[[i]]
-  #print(contest)
+  contest = matches[[i]]
+  
   # get the ids
   id1 <- contest[[1]]
   id2 <- contest[[2]]
@@ -329,9 +233,6 @@ for (i in 1:x) {
   # get the agents
   agent1 = agent_list[[id1]]
   agent2 = agent_list[[id2]]
-  # set the agent ids
-  #agent1$set_id(id1)
-  #agent2$set_id(id2)
   
   # set the opponent number
   agent1$set_opponent_id(id2)
@@ -341,51 +242,37 @@ for (i in 1:x) {
   greeting1 = agent1$my_greeting
   greeting2 = agent2$my_greeting
   
-  #send the greetings
+  # send the greetings
   agent1$set_response(greeting2)
   agent2$set_response(greeting1)
+  
   # set the round number
   agent1$set_round(i) 
   agent2$set_round(i)
   
+  # pass the book to agents
+  agent1$set_book(book)
+  agent2$set_book(book)
+  
   # get the bids
   agent1$get_bid()
   agent2$get_bid()
-  
-  mybid1 <- agent1$bid
-  #print(mybid1)
-  mybid2 <- agent2$bid
-  #print(mybid2)
  
+  # store the bid in a variable
+  mybid1 <- agent1$bid
+  mybid2 <- agent2$bid
   
   # find the payoffs
   payoffs <-subset(df, bid1 == mybid1 & bid2 == mybid2)
-  #print(payoffs)
   
-  # record the transaction
-  book = rbind(book,data.frame("id1"=id1,"id2"=id2,"round"= i,"bid1"=mybid1,"bid2"=mybid2,"points1"=payoffs$payoff1,"points2"=payoffs$payoff2))
-  #print(payoffs$payoff1)
-
-}
-pointlist = data.frame(id=integer(),points=integer())
-
-#print(book)
-
-for(i in 1:4){
-  list1 = book[book$id1 == i,c("points1")]
-  list2 = book[book$id2 == i,c("points2")]
-  pointlist = rbind(pointlist, data.frame("id"=i,"points"=sum(list1) + sum(list2)))
-  if(i==1){
-    maxi = pointlist$points[[i]]
-    ind = i
-  } else{
-    if(maxi < pointlist$points[[i]]){
-      maxi = pointlist$points[[i]]
-      ind = i
-    }
-  }
+  # update ledger
+  ledger[[id1]] = ledger[[id1]] + payoffs$payoff1
+  ledger[[id2]] = ledger[[id2]] + payoffs$payoff2
+  
+  # update the book 
+  book = rbind(book, data.frame("id1"=id1,"id2"=id2,"round"= i,"bid1"=mybid1,"bid2"=mybid2))
+  
 }
 
+print(which.max(ledger))
 print(book)
-print(pointlist)
-print(ind)
