@@ -5,7 +5,7 @@ Agent <- R6Class("Agent",
                  public = list(
                    bid = NULL,
                    book = NULL,
-                   greeting = "Hi we are malware!", 
+                   greeting = "Hi!",
                    id = NULL,
                    opponent_id = NULL,
                    round = NULL, 
@@ -92,12 +92,16 @@ Agent <- R6Class("Agent",
 					rec2 = self$book[self$book$id2 == self$opponent_id, c("round","bid2")]				
 					names(rec1) = c("round","bid")
 					names(rec2) = c("round","bid")
-					rec = rbind(rec1,rec2)                    
-					n_def = nrow(rec[rec$bid == "defect",])
-					n_cop = nrow(rec[rec$bid == "cooperate",])
-					tot_rounds = nrow(rec)                    
-					def_frac = n_def/tot_rounds
-					return(def_frac)
+					rec = rbind(rec1,rec2)  
+					if(nrow(rec) == 0){
+						return(-1)  #if this is the first game of the opponent, then it returns -1
+						} else{
+						n_def = nrow(rec[rec$bid == "defect",])
+						n_cop = nrow(rec[rec$bid == "cooperate",])
+						tot_rounds = nrow(rec)                 
+						def_frac = n_def/tot_rounds
+						return(def_frac)
+						}
 				}
 		 )
 )
