@@ -1,5 +1,5 @@
 library(R6)
-
+#erase
 Agent <- R6Class("Agent",
                  
                  public = list(
