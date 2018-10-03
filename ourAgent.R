@@ -63,7 +63,7 @@ Agent <- R6Class("Agent",
                      # loop to check all encounter of our opponent with other agents (opop)
                      for (id_opop in range(from=0, to=24)) {
                      
-                     rec1 = t[(t$id1 == self$opponent_id) & (t$id1 == self$id_opop),]  # all rounds opponent played as id1 and other agent (opop)
+                     rec1 = t[(t$id1 == self$opponent_id) & (t$id2 == self$id_opop),]  # all rounds opponent played as id1 and other agent (opop)
                      rec2 = t[(t$id2 == self$opponent_id) & (t$id1 == self$id_opop),]   # same but opponent as id2
                      
                      names(rec1) = c("round", "op", "opop", "bid_op", "bid_opop")  # rec1 contains round no., opponent id, opponent's opponent's id, opponent's bid, and opponent's opponent's bid
